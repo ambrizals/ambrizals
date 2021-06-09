@@ -7,9 +7,9 @@ I'm not professional developer, but sometime i always learning about application
 [![Linkedin](https://img.shields.io/static/v1?label=Linkedin&message=%20&logo=Linkedin&style=flat-square&logoColor=white)](https://www.linkedin.com/in/ambrizals)
 [![Email](https://img.shields.io/static/v1?label=Email&message=%20&logo=Gmail&style=flat-square&logoColor=white)](mailto:sabuncolek@ambrizal.net)
 
-- ⚙️ Stack: Visual Basic .Net, PHP, Javascript (NodeJS / Vanilla), Java (Android Mobile Development), Dart. 
-- 🌱 I’m currently learning: Typescript, Ruby On Rails and React Native.
-- 🖼️ Framework already used: Laravel (PHP), Flutter (Cross Platform Framework), NuxtJS (VueJS Framework), Quasar(VueJS Framework) and AdonisJS (NodeJS)
+- ⚙️ Stack: Visual Basic .Net, PHP, Javascript (NodeJS / Vanilla), Java, Dart. 
+- 🌱 I’m currently learning: Spring Ecosystem (like Spring Framework), Typescript, Ruby On Rails and React Native.
+- 🖼️ Framework already used: Laravel (PHP), Flutter (Cross Platform Framework), NuxtJS (VueJS Framework), Quasar(VueJS Framework) and AdonisJS (NodeJS / CommonJS)
 - 🔭 I’m currently working on Bang Bang Decor
 
 <!--
