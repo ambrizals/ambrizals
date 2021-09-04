@@ -1,7 +1,5 @@
 ### 👋 Hi, I'm Ambrizal Suryadinata
-I'm not professional developer, but sometime i always learning about application development on all platform like web apps or mobile apps or desktop apps.
-
-🔭 I’m currently working on Bang Bang Decor
+I'm not professional developer, but sometime i always learning about application development on all platform like web apps or mobile apps or desktop apps, I’m currently working on Bang Bang Decor and sometime i built some application or create some code experiment to help my own bussiness process.
 
 [![Twitter](https://img.shields.io/static/v1?label=Twitter&message=%20&logo=Twitter&style=flat-square&logoColor=white)](https://twitter.com/ambrizals)
 [![Facebook](https://img.shields.io/static/v1?label=Facebook&message=%20&logo=Facebook&style=flat-square&logoColor=white)](https://facebook.com/ambrizalsuryadinata)
