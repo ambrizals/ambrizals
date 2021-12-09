@@ -11,6 +11,7 @@ I'm not professional developer, but sometime i always learning about application
   - Visual Basic .Net
   - PHP
   - Javascript (NodeJS / Vanilla)
+  - TypeScript
   - Java
   - Dart 
 - 🌱 I’m currently learning: 
@@ -22,7 +23,8 @@ I'm not professional developer, but sometime i always learning about application
   - Flutter (Cross Platform Framework)
   - NuxtJS (VueJS Framework)
   - Quasar(VueJS Framework)
-  - AdonisJS (NodeJS / CommonJS)
+  - AdonisJS 4 (NodeJS / CommonJS)
+  - AdonisJS 5 (NodeJS / TypeScript)
 
 <!--
 **ambrizals/ambrizals** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
