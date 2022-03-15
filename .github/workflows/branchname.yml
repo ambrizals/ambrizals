@@ -11,5 +11,9 @@ jobs:
     steps:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4    
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF_SLUG})"
+        id: extract_branch
       - name: Coba
-        run: echo ${GITHUB_REF_SLUG}
+        run: echo ${{ steps.extract_branch.outputs.branch }}
