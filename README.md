@@ -1,4 +1,5 @@
 ### 👋 Hi, I'm Ambrizal Suryadinata
+[![wakatime](https://wakatime.com/badge/user/881bf991-699d-44a5-9507-ffa85ba5e552.svg)](https://wakatime.com/@881bf991-699d-44a5-9507-ffa85ba5e552)
 I'm not professional developer, but sometime i always learning about application development on all platform like web apps or mobile apps or desktop apps, I’m currently working on [Bang Bang Decor](https://g.page/bangbang_decor?share) and sometime i built some application or create some code experiment to help my own bussiness process.
 
 [![Twitter](https://img.shields.io/static/v1?label=Twitter&message=%20&logo=Twitter&style=flat-square&logoColor=white)](https://twitter.com/ambrizals)
