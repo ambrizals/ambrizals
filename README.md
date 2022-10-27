@@ -9,15 +9,15 @@
 I'm not professional developer, but sometime i always learning about application development on all platform like web apps or mobile apps or desktop apps, I’m currently working on [Bang Bang Decor](https://g.page/bangbang_decor?share) and sometime i built some application or create some code experiment to help my own bussiness process.
 
 - ⚙️ Stack: 
-  - Visual Basic .Net
+  - ~~Visual Basic .Net~~
   - PHP
   - Javascript (NodeJS / Vanilla)
   - TypeScript
-  - Java
+  - ~~Java~~
   - Dart 
 - 🌱 I’m currently learning: 
-  - Spring Ecosystem (like Spring Framework)
-  - Typescript, ~~Ruby On Rails~~, Go Lang
+  - ~~Spring Ecosystem (like Spring Framework)~~
+  - ~~Ruby On Rails~~, Go Lang
   - React Native.
 - 🖼️ Framework already used: 
   - Laravel (PHP Framework)
