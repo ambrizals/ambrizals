@@ -23,6 +23,7 @@ Over the years, I’ve worked on both freelance and personal projects—like dev
 | ExpressJS (JavaScript / TypeScript)          | ReactJS                  | MariaDB / MySQL            |
 | Laravel (PHP)                                | VueJS / NuxtJS (v2, v3)  | PostgreSQL                 |
 | AdonisJS (JavaScript / TypeScript)           | Flutter                  | Microsoft SQL / Azure SQL  |
+| Elysia JS (TypeScript, Bun)                  |                          |                            |
 
 ---
 
