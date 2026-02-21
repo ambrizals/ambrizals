@@ -15,6 +15,9 @@ I'm a passionate software engineer with experience working across various indust
 Over the years, I’ve worked on both freelance and personal projects—like developing a custom ERP system for [Bang Bang Decor](https://g.page/bangbang_decor?share), building infrastructure for local assessment testing platforms and more.
 
 ---
+<!--START_SECTION:waka-->
+<!--END_SECTION:waka-->
+---
 
 ## 🧰 Application Stack
 
