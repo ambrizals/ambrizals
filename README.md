@@ -18,9 +18,9 @@ Over the years, I’ve worked on both freelance and personal projects—like dev
 <!--START_SECTION:waka-->
 
 ```txt
-Total Time: 4,202 hrs
+Total Time: 4,202 hrs 10 mins
 
-TypeScript                 1,891 hrs 59 mins     ██████████░░░░░░░░░░░░░░░   39.59 %
+TypeScript                 1,892 hrs 8 mins      ██████████░░░░░░░░░░░░░░░   39.59 %
 Other                      576 hrs 37 mins       ███░░░░░░░░░░░░░░░░░░░░░░   12.07 %
 ```
 
