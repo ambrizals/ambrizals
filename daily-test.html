@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Formulir Test Harian — Item Cabang</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+
+    <style>
+      /* Base card */
+      .card {
+        margin: 0 0 18px;
+        padding: 18px 20px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        background: #fafafa;
+      }
+      .card h2 {
+        margin: 0 0 14px;
+        font-size: 17px;
+        color: #222;
+      }
+
+      /* Header: column form */
+      .field-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+      }
+      .field label {
+        font-size: 12px;
+        color: #555;
+        margin-bottom: 4px;
+        font-weight: 700;
+      }
+      .field label .req {
+        color: #c44;
+      }
+      .field input,
+      .field select,
+      .field textarea {
+        font-size: 14px;
+        padding: 7px 9px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: #fff;
+        color: #333;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .field input:read-only,
+      .field input[readonly] {
+        background: #f0f0f0;
+        color: #555;
+      }
+      .field textarea {
+        resize: vertical;
+        min-height: 40px;
+      }
+      .field.half {
+        grid-column: span 1;
+      }
+      .field.full {
+        grid-column: 1 / -1;
+      }
+
+      /* Radio: inline */
+      .radio-row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        height: 34px;
+      }
+      .radio-row label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      /* Subsection title */
+      .subtitle {
+        font-size: 13px;
+        font-weight: 700;
+        color: #393939;
+        margin: 14px 0 8px;
+      }
+
+      /* Pair row: two inputs side-by-side */
+      .pair {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+      .pair .field {
+        min-width: 0;
+      }
+
+      /* Daily test table */
+      .table-wrap {
+        overflow-x: auto;
+      }
+      table.daily {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        font-size: 14px;
+      }
+      table.daily th,
+      table.daily td {
+        border: 1px solid #e0e0e0;
+        padding: 6px 8px;
+        text-align: left;
+      }
+      table.daily th {
+        background: #f4f4f4;
+        color: #444;
+        font-size: 13px;
+        font-weight: 700;
+      }
+      table.daily td input,
+      table.daily td select {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid transparent;
+        background: transparent;
+        font: inherit;
+        color: #333;
+        padding: 4px 6px;
+      }
+      table.daily td input:focus,
+      table.daily td select:focus {
+        outline: none;
+        border-color: #39c;
+        border-radius: 3px;
+        background: #fff;
+      }
+      table.daily td.num {
+        width: 40px;
+        text-align: center;
+        color: #666;
+        font-size: 13px;
+      }
+      table.daily td.actions {
+        width: 80px;
+        text-align: center;
+      }
+      table.daily td.actions button {
+        cursor: pointer;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: #fff;
+        padding: 3px 8px;
+        font-size: 12px;
+      }
+      table.daily td.actions button.remove:hover {
+        background: #fbeaea;
+        border-color: #d66;
+        color: #a33;
+      }
+      table.daily td.actions button.rekam {
+        background: #e6f4ea;
+        border-color: #2a7d3b;
+        color: #1a5c2a;
+      }
+      table.daily td.actions button.rekam:hover {
+        background: #c8e6c9;
+      }
+
+      /* Toolbar */
+      .toolbar {
+        margin: 0 0 10px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .toolbar button {
+        cursor: pointer;
+        border-radius: 4px;
+        padding: 7px 14px;
+        font-size: 14px;
+      }
+      .btn-primary {
+        background: #39c;
+        border: 1px solid #2d87b0;
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: #2d87b0;
+      }
+      .btn-ghost {
+        background: #fff;
+        border: 1px solid #ccc;
+        color: #333;
+      }
+      .btn-ghost:hover {
+        background: #f4f4f4;
+      }
+
+      .notice {
+        font-size: 13px;
+        color: #777;
+        margin-bottom: 14px;
+      }
+      .notice.ok {
+        color: #2a7d3b;
+      }
+
+      @media print {
+        .toolbar, .no-print {
+          display: none !important;
+        }
+        .card {
+          border: none;
+          padding: 0;
+          background: transparent;
+        }
+        body {
+          padding: 0.4in;
+          font-size: 11pt;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <section style="border:0; width:auto; float:none; padding:0;">
+        <h1>Item Cabang — Test Harian</h1>
+        <p class="notice">Formulir berdasarkan halaman <strong>Item Cabang</strong>. Isi kolom header (bagian atas) dan tambahkan baris pada <strong>Tes Harian</strong> (tabel). Data tersimpan otomatis di browser.</p>
+
+        <!-- ============ HEADER: KOLOM ISIAN ============ -->
+        <div class="card">
+          <h2>Header</h2>
+          <div class="field-grid">
+            <div class="field">
+              <label for="f-nama">Nama Barang <span class="req">*</span></label>
+              <input id="f-nama" type="text" placeholder="Contoh: ARC Hbsag Next Qual Control" readonly>
+            </div>
+            <div class="field">
+              <label for="f-lot">Nomor Lot <span class="req">*</span></label>
+              <input id="f-lot" type="text" placeholder="Contoh: 69231FZ00" readonly>
+            </div>
+            <div class="field">
+              <label for="f-total">Total Stok</label>
+              <input id="f-total" type="number" min="0" step="1" value="0" readonly>
+            </div>
+            <div class="field">
+              <label for="f-pakai">Qty Pakai Barang</label>
+              <input id="f-pakai" type="number" min="0" step="1" value="0">
+            </div>
+            <div class="field">
+              <label for="f-expired">Expired Date <span class="req">*</span></label>
+              <input id="f-expired" type="date">
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ SATUAN ============ -->
+        <div class="card">
+          <h2>Satuan</h2>
+          <div class="pair">
+            <div class="field">
+              <label for="f-satuan">Jumlah Tes dalam Satuan <span class="req">*</span></label>
+              <input id="f-satuan" type="number" min="0" step="1" value="0">
+            </div>
+            <div class="field">
+              <label for="f-serial">Nomor Serial</label>
+              <input id="f-serial" type="text" placeholder="Contoh: 4AA">
+            </div>
+          </div>
+          <div class="subtitle" style="margin-top:14px;">Sisa Tes <span class="req">*</span></div>
+          <div class="field-grid">
+            <div class="field">
+              <input id="f-sisa" type="number" min="0" step="1" value="0">
+            </div>
+          </div>
+          <div class="field full" style="margin-top:10px;">
+            <label>
+              <input type="checkbox" id="f-tidak"> Tandai jika sisa tes tidak terpakai
+            </label>
+          </div>
+        </div>
+
+        <!-- ============ TES HARIAN: TABEL ============ -->
+        <div class="card">
+          <h2>Tes Harian</h2>
+          <p class="notice" style="margin-bottom:10px;">Isi sesuai dengan reagent yang digunakan</p>
+          <div class="toolbar no-print">
+            <button type="button" class="btn-primary" id="btn-add">+ Tambah Baris</button>
+          </div>
+          <div class="table-wrap">
+            <table class="daily" id="daily-table">
+              <thead>
+                <tr>
+                  <th style="width:36px;">No</th>
+                  <th>Tanggal</th>
+                  <th>Kalibrasi</th>
+                  <th>Kontrol</th>
+                  <th>Pasien</th>
+                  <th>Duplo</th>
+                  <th>Agregasi Trombosit</th>
+                </tr>
+              </thead>
+              <tbody id="daily-body">
+                <!-- rows via JS -->
+              </tbody>
+            </table>
+          </div>
+          <div class="subtitle" style="margin-top:10px;">Jumlah Tes Harian</div>
+          <div class="field">
+            <input id="f-tes-harian" type="number" min="0" step="1" value="0">
+          </div>
+        </div>
+
+        <div class="toolbar no-print">
+          <button type="button" class="btn-primary" id="btn-submit">Submit</button>
+          <button type="button" class="btn-ghost" id="btn-batal">Batal</button>
+        </div>
+
+        <p class="notice" id="status-msg"></p>
+      </section>
+    </div>
+
+    <script>
+      (function () {
+        'use strict';
+
+        var STORAGE_KEY = 'testHarianItemCabang.v1';
+
+        /* ---------- Selectors ---------- */
+        var dailyBody = document.getElementById('daily-body');
+        var statusMsg = document.getElementById('status-msg');
+
+        /* ---------- Helpers ---------- */
+        function $(id) { return document.getElementById(id); }
+
+        function headerData() {
+          return {
+            nama: $('f-nama').value,
+            lot: $('f-lot').value,
+            total: $('f-total').value,
+            pakai: $('f-pakai').value,
+            expired: $('f-expired').value,
+            satuan: $('f-satuan').value,
+            serial: $('f-serial').value,
+            sisa: $('f-sisa').value,
+            tidak: $('f-tidak').checked,
+            tesHarian: $('f-tes-harian').value
+          };
+        }
+
+        function setHeader(data) {
+          if (!data) return;
+          $('f-nama').value = data.nama || '';
+          $('f-lot').value = data.lot || '';
+          $('f-total').value = data.total || 0;
+          $('f-pakai').value = data.pakai || 0;
+          $('f-expired').value = data.expired || '';
+          $('f-satuan').value = data.satuan || 0;
+          $('f-serial').value = data.serial || '';
+          $('f-sisa').value = data.sisa || 0;
+          $('f-tidak').checked = !!data.tidak;
+          $('f-tes-harian').value = data.tesHarian || 0;
+        }
+
+        function rowData(tr) {
+          var inputs = tr.querySelectorAll('input');
+          return {
+            tanggal: inputs[0].value,
+            kalibrasi: inputs[1].value,
+            kontrol: inputs[2].value,
+            pasien: inputs[3].value,
+            duplo: inputs[4].value,
+            agregasi: inputs[5].value
+          };
+        }
+
+        function buildRow(data) {
+          data = data || {};
+          var tr = document.createElement('tr');
+
+          var no = document.createElement('td');
+          no.className = 'num';
+
+          function cell(type, value) {
+            var td = document.createElement('td');
+            var input = document.createElement('input');
+            input.type = type || 'text';
+            input.value = value || '';
+            td.appendChild(input);
+            return td;
+          }
+
+          var tanggal = document.createElement('td');
+          var t = document.createElement('input');
+          t.type = 'date';
+          t.value = data.tanggal || '';
+          tanggal.appendChild(t);
+
+          tr.appendChild(no);
+          tr.appendChild(tanggal);
+          tr.appendChild(cell('number', data.kalibrasi));
+          tr.appendChild(cell('number', data.kontrol));
+          tr.appendChild(cell('number', data.pasien));
+          tr.appendChild(cell('number', data.duplo));
+          tr.appendChild(cell('number', data.agregasi));
+
+          var act = document.createElement('td');
+          act.className = 'actions';
+          var rekam = document.createElement('button');
+          rekam.type = 'button';
+          rekam.className = 'rekam';
+          rekam.textContent = 'Rekam';
+          rekam.style.background = '#e6f4ea';
+          rekam.style.borderColor = '#2a7d3b';
+          rekam.style.color = '#1a5c2a';
+          rekam.addEventListener('click', function () {
+            msg('Baris #' + (no.textContent || '?') + ' direkam.', true);
+            save();
+          });
+          var del = document.createElement('button');
+          del.type = 'button';
+          del.className = 'remove';
+          del.textContent = 'Hapus';
+          del.addEventListener('click', function () {
+            tr.remove();
+            renumber();
+            msg('Baris dihapus.');
+            save();
+          });
+          act.appendChild(rekam);
+          act.appendChild(del);
+          tr.appendChild(act);
+
+          return tr;
+        }
+
+        function renumber() {
+          var rows = dailyBody.querySelectorAll('tr');
+          Array.prototype.forEach.call(rows, function (tr, i) {
+            tr.querySelector('.num').textContent = (i + 1) + '.';
+          });
+        }
+
+        function rowsData() {
+          var out = [];
+          dailyBody.querySelectorAll('tr').forEach(function (tr) {
+            out.push(rowData(tr));
+          });
+          return out;
+        }
+
+        function setRows(list) {
+          dailyBody.innerHTML = '';
+          (list || []).forEach(function (r) { dailyBody.appendChild(buildRow(r)); });
+          renumber();
+        }
+
+        function addRow() {
+          dailyBody.appendChild(buildRow());
+          renumber();
+        }
+
+        function msg(text, ok) {
+          statusMsg.textContent = text || '';
+          statusMsg.className = 'notice' + (ok ? ' ok' : '');
+          if (text) {
+            setTimeout(function () { if (statusMsg.textContent === text) { statusMsg.textContent = ''; statusMsg.className = 'notice'; } }, 4000);
+          }
+        }
+
+        function save() {
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({ header: headerData(), rows: rowsData() }));
+            msg('Tersimpan.', true);
+          } catch (e) {
+            msg('Gagal menyimpan: ' + e.message);
+          }
+        }
+
+        function load() {
+          try { var raw = localStorage.getItem(STORAGE_KEY); } catch (e) { raw = null; }
+          if (!raw) { addRow(); return; }
+          try {
+            var parsed = JSON.parse(raw);
+            setHeader(parsed.header);
+            if (parsed.rows && parsed.rows.length) setRows(parsed.rows);
+            else addRow();
+          } catch (e) {
+            addRow();
+          }
+        }
+
+        function resetAll() {
+          if (!confirm('Kosongkan seluruh formulir dan tabel?')) return;
+          setHeader({});
+          setRows([]);
+          addRow();
+          localStorage.removeItem(STORAGE_KEY);
+          msg('Formulir dikosongkan.');
+        }
+
+        function submitForm() {
+          if (!$('f-nama').value) { msg('Nama Barang wajib diisi.'); return; }
+          if (!$('f-lot').value) { msg('Nomor Lot wajib diisi.'); return; }
+          if (!$('f-expired').value) { msg('Expired Date wajib diisi.'); return; }
+          save();
+          msg('Data dikirim (simulasi submit).', true);
+        }
+
+        /* ---------- Events ---------- */
+        $('btn-add').addEventListener('click', function () { addRow(); save(); });
+        $('btn-save').addEventListener('click', save);
+        $('btn-reset').addEventListener('click', resetAll);
+        $('btn-print').addEventListener('click', function () { window.print(); });
+        $('btn-submit').addEventListener('click', submitForm);
+        $('btn-batal').addEventListener('click', function () {
+          if (confirm('Reset form?')) { resetAll(); }
+        });
+
+        /* autosave on changes */
+        document.addEventListener('input', function (e) { if (e.target.closest('.card')) save(); });
+        document.addEventListener('change', function (e) { if (e.target.closest('.card')) save(); });
+
+        load();
+      })();
+    </script>
+  </body>
+</html>
