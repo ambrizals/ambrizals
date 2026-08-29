@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Formulir Test Harian — Item Cabang</title>
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <link rel="stylesheet" href="../stylesheets/styles.css">
+    <link rel="stylesheet" href="../stylesheets/github-light.css">
 
     <style>
       /* ========== BASE ========== */
@@ -267,6 +267,53 @@
         border-color: #f87171;
       }
 
+      /* Status badges */
+      table.daily td.status-cell {
+        min-width: 110px;
+      }
+      .status-badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        line-height: 1.4;
+      }
+      .status-badge.terekam {
+        background: #ecfdf5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+      }
+      .status-badge.pending {
+        background: #fffbeb;
+        color: #92400e;
+        border: 1px solid #fde68a;
+      }
+      .status-badge.terubah {
+        background: #eff6ff;
+        color: #1e40af;
+        border: 1px solid #bfdbfe;
+      }
+      .status-select {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        background: transparent;
+        font: inherit;
+        color: #1f2937;
+        padding: 5px 7px;
+        cursor: pointer;
+      }
+      .status-select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        background: #ffffff;
+        box-shadow: 0 0 0 2px rgba(59,130,246,.1);
+      }
+
       /* empty state */
       .empty-row td {
         padding: 28px 10px;
@@ -458,6 +505,7 @@
                 <tr>
                   <th style="width:38px;">No</th>
                   <th>Tanggal</th>
+                  <th>Status</th>
                   <th>Kalibrasi</th>
                   <th>Kontrol</th>
                   <th>Pasien</th>
@@ -476,8 +524,6 @@
 
         <!-- ============ FOOTER ACTIONS ============ -->
         <div class="form-actions no-print">
-          <button type="button" class="btn-danger" id="btn-reset">Kosongkan</button>
-          <button type="button" class="btn-ghost" id="btn-batal">Batal</button>
           <button type="button" class="btn-primary" id="btn-submit">Submit</button>
         </div>
 
@@ -527,8 +573,18 @@
 
         function rowData(tr) {
           var inputs = tr.querySelectorAll('input');
+          var statusEl = tr.querySelector('.status-badge, .status-select');
+          var statusVal = '';
+          if (statusEl) {
+            if (statusEl.tagName === 'SELECT') {
+              statusVal = statusEl.value;
+            } else if (statusEl.classList.contains('status-badge')) {
+              statusVal = statusEl.textContent;
+            }
+          }
           return {
             tanggal: inputs[0].value,
+            status: statusVal,
             kalibrasi: inputs[1].value,
             kontrol: inputs[2].value,
             pasien: inputs[3].value,
@@ -536,6 +592,23 @@
             agregasi: inputs[5].value,
             jumlahTesHarian: inputs[6].value
           };
+        }
+
+        function getRowStatus(tr) {
+          var el = tr.querySelector('.status-badge, .status-select');
+          if (!el) return '';
+          if (el.tagName === 'SELECT') return el.value;
+          return el.textContent.trim();
+        }
+
+        function setRowStatus(tr, status) {
+          var td = tr.querySelector('.status-cell');
+          if (!td) return;
+          td.innerHTML = '';
+          var badge = document.createElement('span');
+          badge.className = 'status-badge ' + status.toLowerCase();
+          badge.textContent = status;
+          td.appendChild(badge);
         }
 
         function buildRow(data) {
@@ -560,8 +633,38 @@
           t.value = data.tanggal || '';
           tanggal.appendChild(t);
 
+          var statusTd = document.createElement('td');
+          statusTd.className = 'status-cell';
+          var status = data.status || 'PENDING';
+          if (status) {
+            var badge = document.createElement('span');
+            badge.className = 'status-badge ' + status.toLowerCase();
+            badge.textContent = status;
+            statusTd.appendChild(badge);
+          } else {
+            var statusInput = document.createElement('select');
+            statusInput.className = 'status-select';
+            ['', 'TEREKAM', 'PENDING', 'TERUBAH'].forEach(function (opt) {
+              var o = document.createElement('option');
+              o.value = opt;
+              o.textContent = opt || '— pilih status —';
+              if (opt === (data.status || '')) o.selected = true;
+              statusInput.appendChild(o);
+            });
+            statusInput.addEventListener('change', function () {
+              statusTd.innerHTML = '';
+              var b = document.createElement('span');
+              b.className = 'status-badge ' + statusInput.value.toLowerCase();
+              b.textContent = statusInput.value;
+              statusTd.appendChild(b);
+              save();
+            });
+            statusTd.appendChild(statusInput);
+          }
+
           tr.appendChild(no);
           tr.appendChild(tanggal);
+          tr.appendChild(statusTd);
           tr.appendChild(cell('number', data.kalibrasi));
           tr.appendChild(cell('number', data.kontrol));
           tr.appendChild(cell('number', data.pasien));
@@ -578,7 +681,10 @@
           rekam.className = 'btn-rekam';
           rekam.textContent = 'Rekam';
           rekam.addEventListener('click', function () {
-            msg('Baris #' + (no.textContent || '?') + ' berhasil direkam.', true);
+            var current = getRowStatus(tr);
+            var next = current === 'TEREKAM' ? 'TERUBAH' : 'TEREKAM';
+            setRowStatus(tr, next);
+            msg('Baris #' + (no.textContent || '?') + ' → ' + next, true);
             save();
           });
 
@@ -608,7 +714,7 @@
             tr.className = 'empty-row';
             tr.id = 'empty-placeholder';
             var td = document.createElement('td');
-            td.colSpan = 8;
+            td.colSpan = 9;
             td.textContent = 'Belum ada data. Klik "+ Tambah Baris" untuk menambah.';
             tr.appendChild(td);
             dailyBody.appendChild(tr);
@@ -616,6 +722,18 @@
             var ph = document.getElementById('empty-placeholder');
             if (ph) ph.remove();
           }
+        }
+
+        function loadDemoRows() {
+          var today = new Date().toISOString().slice(0, 10);
+          var demos = [
+            { tanggal: today, status: 'TEREKAM', kalibrasi: '1', kontrol: '2', pasien: '3', duplo: '4', agregasi: '5', jumlahTesHarian: '10' },
+            { tanggal: today, status: 'PENDING', kalibrasi: '1', kontrol: '2', pasien: '3', duplo: '4', agregasi: '5', jumlahTesHarian: '8' },
+            { tanggal: today, status: 'TERUBAH', kalibrasi: '1', kontrol: '2', pasien: '3', duplo: '4', agregasi: '5', jumlahTesHarian: '12' }
+          ];
+          demos.forEach(function (d) { dailyBody.appendChild(buildRow(d)); });
+          renumber();
+          updateEmptyState();
         }
 
         function renumber() {
@@ -674,23 +792,15 @@
         function load() {
           var raw;
           try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) { raw = null; }
-          if (!raw) { updateEmptyState(); return; }
+          if (!raw) { loadDemoRows(); return; }
           try {
             var parsed = JSON.parse(raw);
             setHeader(parsed.header);
             if (parsed.rows && parsed.rows.length) setRows(parsed.rows);
-            else updateEmptyState();
+            else loadDemoRows();
           } catch (e) {
-            updateEmptyState();
+            loadDemoRows();
           }
-        }
-
-        function resetAll() {
-          if (!confirm('Kosongkan seluruh formulir dan tabel?')) return;
-          setHeader({});
-          setRows([]);
-          localStorage.removeItem(STORAGE_KEY);
-          msg('Formulir dikosongkan.');
         }
 
         function submitForm() {
@@ -703,11 +813,7 @@
 
         /* ---------- Events ---------- */
         $('btn-add').addEventListener('click', function () { addRow(); save(); });
-        $('btn-reset').addEventListener('click', resetAll);
         $('btn-submit').addEventListener('click', submitForm);
-        $('btn-batal').addEventListener('click', function () {
-          if (confirm('Kembali ke awal?')) resetAll();
-        });
 
         /* autosave */
         document.addEventListener('input', function (e) { if (e.target.closest('.card')) save(); });
