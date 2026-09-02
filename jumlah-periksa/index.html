@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jumlah Periksa - Prototyping</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { 50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0', 300: '#86efac', 400: '#4ade80', 500: '#22c55e', 600: '#16a34a', 700: '#15803d', 800: '#166534', 900: '#14532d' },
+            surface: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    .modal-backdrop { backdrop-filter: blur(4px); }
+    .slide-in { animation: slideIn 0.3s ease-out; }
+    .slide-out { animation: slideOut 0.25s ease-in; }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(-20px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes slideOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(-20px) scale(0.97); } }
+    .fade-in { animation: fadeIn 0.2s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .item-row { transition: all 0.2s ease; }
+    .item-row:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type="number"] { -moz-appearance: textfield; }
+    .badge { font-size: 0.65rem; padding: 2px 8px; border-radius: 9999px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    .btn-primary { @apply bg-primary-700 hover:bg-primary-800 text-white font-semibold py-2.5 px-6 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98]; }
+    .btn-outline { @apply border-2 border-surface-300 hover:border-surface-400 text-surface-700 font-semibold py-2.5 px-6 rounded-lg transition-all duration-200 hover:bg-surface-50 active:scale-[0.98]; }
+    .btn-danger { @apply bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98]; }
+    .input-field {
+      display: block;
+      width: 100%;
+      border: 2px solid #cbd5e1;
+      border-radius: 0.5rem;
+      padding: 0.625rem 0.75rem;
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+      color: #1e293b;
+      background-color: #edf1f6;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.08);
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    .input-field:focus {
+      background-color: #ffffff;
+      border-color: #16a34a;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.06), 0 0 0 3px rgba(22,163,74,0.18);
+    }
+    .input-field::placeholder { color: #94a3b8; }
+    .input-readonly {
+      color: #475569;
+      cursor: not-allowed;
+      background-color: #e2e8f0;
+      border-color: #b0bec5;
+    }
+    .input-disabled {
+      color: #94a3b8;
+      cursor: not-allowed;
+      background-color: #f1f5f9;
+      border-color: #e2e8f0;
+    }
+    .label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 0.375rem;
+    }
+    .label-required::after { content: ' *'; color: #ef4444; }
+    .section-title { @apply text-base font-bold text-surface-800 uppercase tracking-wide; }
+    .table-input {
+      display: block;
+      width: 100%;
+      text-align: center;
+      border: 2px solid #cbd5e1;
+      border-radius: 0.5rem;
+      padding: 0.375rem 0.5rem;
+      font-size: 0.875rem;
+      color: #1e293b;
+      background-color: #edf1f6;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    .table-input:focus {
+      background-color: #ffffff;
+      border-color: #16a34a;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.04), 0 0 0 2px rgba(22,163,74,0.15);
+      position: relative;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body class="bg-surface-100 min-h-screen">
+
+  <!-- Main Container -->
+  <div class="max-w-5xl mx-auto py-6 px-4">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-3">
+        <label class="text-sm font-semibold text-surface-600">Cabang :</label>
+        <select id="branchSelect" class="input-field w-64 bg-surface-100 font-medium cursor-pointer">
+          <option>Biomedika - Ciujung</option>
+          <option>Biomedika - Pusat</option>
+          <option>Biomedika - Cabang Utama</option>
+        </select>
+      </div>
+      <button onclick="openPakaiBarangModal()" class="bg-primary-700 hover:bg-primary-800 text-white font-semibold py-2 px-5 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-2 active:scale-[0.98]">
+        <span>Buka Reagent Baru</span>
+        <i class="fas fa-plus text-xs"></i>
+      </button>
+    </div>
+
+    <!-- Date Navigation -->
+    <div class="bg-primary-700 text-white rounded-xl py-3 px-6 flex items-center justify-between mb-5 shadow-md">
+      <button onclick="changeDate(-1)" class="hover:bg-primary-800 rounded-lg p-2 transition-colors" title="Tanggal Sebelumnya">
+        <i class="fas fa-chevron-left text-lg"></i>
+      </button>
+      <span id="currentDateDisplay" class="text-lg font-bold tracking-wide"></span>
+      <button onclick="changeDate(1)" class="hover:bg-primary-800 rounded-lg p-2 transition-colors" title="Tanggal Berikutnya">
+        <i class="fas fa-chevron-right text-lg"></i>
+      </button>
+    </div>
+
+    <!-- Table Header -->
+    <div class="bg-white rounded-t-xl border border-b-0 border-surface-200 px-5 py-3">
+      <div class="grid grid-cols-12 gap-2 text-xs font-bold text-surface-600 uppercase tracking-wider">
+        <div class="col-span-1"></div>
+        <div class="col-span-2">Kode Barang</div>
+        <div class="col-span-3">Nama Barang</div>
+        <div class="col-span-1 text-center">Control</div>
+        <div class="col-span-1 text-center">Kalibrasi</div>
+        <div class="col-span-1 text-center">Pasien</div>
+        <div class="col-span-1 text-center">Trombosit</div>
+        <div class="col-span-1 text-center">Sisa Test</div>
+        <div class="col-span-1 text-right">Aksi</div>
+      </div>
+    </div>
+
+    <!-- Items List -->
+    <div id="itemsList" class="bg-white rounded-b-xl border border-surface-200 divide-y divide-surface-100">
+      <!-- Items rendered by JS -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="hidden bg-white rounded-xl border border-surface-200 py-16 text-center">
+      <i class="fas fa-flask text-5xl text-surface-300 mb-4"></i>
+      <p class="text-surface-500 text-lg font-medium">Belum ada reagent untuk tanggal ini</p>
+      <p class="text-surface-400 text-sm mt-1">Klik "Buka Reagent Baru" untuk menambahkan</p>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: Pakai Barang ==================== -->
+  <div id="pakaiBarangModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/40 modal-backdrop" onclick="closePakaiBarangModal()"></div>
+    <div class="relative flex items-start justify-center min-h-screen pt-[5vh] px-4">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg slide-in relative overflow-hidden">
+        <!-- Modal Header -->
+        <div class="px-7 pt-6 pb-4 border-b border-surface-100">
+          <h2 class="text-xl font-bold text-primary-700">Pakai Barang</h2>
+        </div>
+        <!-- Modal Body -->
+        <div class="px-7 py-5">
+          <!-- Section: Informasi Item -->
+          <div class="mb-6">
+            <div class="flex items-center gap-2 mb-4">
+              <span class="w-1.5 h-5 bg-primary-600 rounded-full inline-block"></span>
+              <h3 class="text-xs font-bold text-surface-500 uppercase tracking-wider">Informasi Item</h3>
+            </div>
+            <div class="space-y-5">
+              <!-- Tanggal -->
+              <div>
+                <label class="label label-required">Tanggal</label>
+                <input id="pakaiTanggal" type="text" class="input-field input-readonly" readonly />
+              </div>
+
+              <!-- Pilih Item -->
+              <div>
+                <label class="label label-required">Pilih Item</label>
+                <select id="pakaiItem" class="input-field cursor-pointer" onchange="onItemSelect()">
+                  <option value="">-- Pilih Item --</option>
+                  <option value="RG2266" data-name="ARC Hbsag Next Qual Control" data-lot="69231FZ00" data-exp="15.04.26" data-unit="Bal" data-stock="4" data-qty-test="400">ARC Hbsag Next Qual Control</option>
+                  <option value="RG0001" data-name="Contoh Barang Reagent" data-lot="LOT123" data-exp="12.12.26" data-unit="Pcs" data-stock="40" data-qty-test="50">Contoh Barang Reagent</option>
+                  <option value="RG1088" data-name="Hemoglobin Test Strip" data-lot="HB2024A" data-exp="08.12.26" data-unit="Box" data-stock="12" data-qty-test="200">Hemoglobin Test Strip</option>
+                  <option value="RG3045" data-name="Urine Reagent Strip 10" data-lot="UR10B3" data-exp="20.06.27" data-unit="Botol" data-stock="8" data-qty-test="100">Urine Reagent Strip 10</option>
+                </select>
+              </div>
+
+              <!-- No. Lot -->
+              <div>
+                <label class="label label-required">No. Lot</label>
+                <div class="flex items-center gap-3">
+                  <input id="pakaiLot" type="text" class="input-field input-readonly flex-1" readonly placeholder="Pilih item terlebih dahulu" />
+                  <span id="pakaiLotBadge" class="badge bg-primary-100 text-primary-700 hidden">Tersedia</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="border-t border-surface-200 my-1"></div>
+
+          <!-- Section: Detail Penggunaan -->
+          <div class="pt-5 mb-2">
+            <div class="flex items-center gap-2 mb-4">
+              <span class="w-1.5 h-5 bg-primary-600 rounded-full inline-block"></span>
+              <h3 class="text-xs font-bold text-surface-500 uppercase tracking-wider">Detail Penggunaan</h3>
+            </div>
+            <div class="space-y-5">
+              <!-- Satuan & Stok & Qty row -->
+              <div class="grid grid-cols-3 gap-4">
+                <div>
+                  <label class="label label-required">Satuan</label>
+                  <select id="pakaiSatuan" class="input-field cursor-pointer" disabled>
+                    <option value="">-- Pilih Satuan --</option>
+                    <option value="Bal">Bal</option>
+                    <option value="Pcs">Pcs</option>
+                    <option value="Box">Box</option>
+                    <option value="Botol">Botol</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="label">Stok</label>
+                  <input id="pakaiStock" type="text" class="input-field input-readonly" readonly placeholder="-" />
+                </div>
+                <div>
+                  <label class="label label-required">Qty</label>
+                  <input id="pakaiQty" type="number" class="input-field" min="1" value="1" placeholder="Jumlah" />
+                </div>
+              </div>
+
+              <!-- Lanjutkan -->
+              <div>
+                <label class="label label-required">Lanjutkan Pengisian Jumlah Periksa?</label>
+                <div class="flex items-center gap-6 mt-2">
+                  <label class="flex items-center gap-2 cursor-pointer group">
+                    <input type="radio" name="lanjutkan" value="ya" checked class="w-4 h-4 text-primary-600 focus:ring-primary-500" />
+                    <span class="text-sm font-medium text-surface-700 group-hover:text-primary-700 transition-colors">Ya</span>
+                  </label>
+                  <label class="flex items-center gap-2 cursor-pointer group">
+                    <input type="radio" name="lanjutkan" value="tidak" class="w-4 h-4 text-primary-600 focus:ring-primary-500" />
+                    <span class="text-sm font-medium text-surface-700 group-hover:text-primary-700 transition-colors">Tidak</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="px-7 py-4 bg-surface-50 border-t border-surface-100 flex items-center justify-between">
+          <button onclick="markAsHoliday()" class="bg-primary-700 hover:bg-primary-800 text-white font-semibold py-2.5 px-5 rounded-lg transition-all duration-200 text-sm shadow-sm hover:shadow-md active:scale-[0.98]">
+            <i class="fas fa-calendar-check mr-2"></i>Tandai Sebagai Hari Libur
+          </button>
+          <div class="flex items-center gap-3">
+            <button onclick="closePakaiBarangModal()" class="btn-outline text-sm py-2.5 px-5">Batal</button>
+            <button onclick="handlePakaiBarangNext()" class="btn-primary text-sm py-2.5 px-5">Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: Jumlah Periksa Form ==================== -->
+  <div id="jumlahPeriksaModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/40 modal-backdrop" onclick="closeJumlahPeriksaModal()"></div>
+    <div class="relative flex items-start justify-center min-h-screen pt-[3vh] px-4">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg slide-in relative overflow-hidden max-h-[94vh] flex flex-col">
+        <!-- Modal Header -->
+        <div class="px-7 pt-6 pb-4 border-b border-surface-100 shrink-0">
+          <h2 class="text-xl font-bold text-primary-700">JUMLAH PERIKSA</h2>
+        </div>
+
+        <!-- Modal Body (scrollable) -->
+        <div class="px-7 py-5 space-y-5 overflow-y-auto flex-1">
+          <!-- Item Info Card -->
+          <div class="bg-primary-50 border border-primary-200 rounded-xl p-5 space-y-2">
+            <div class="grid grid-cols-[140px_10px_1fr] gap-y-1.5 text-sm">
+              <span class="font-semibold text-surface-700">Kode Barang</span><span class="text-surface-500">:</span><span id="infoKodeBarang" class="font-medium text-surface-800">-</span>
+              <span class="font-semibold text-surface-700">Nama Barang</span><span class="text-surface-500">:</span><span id="infoNamaBarang" class="font-medium text-surface-800">-</span>
+              <span class="font-semibold text-surface-700">Nomor Lot</span><span class="text-surface-500">:</span><span id="infoNomorLot" class="font-medium text-surface-800">-</span>
+              <span class="font-semibold text-surface-700">Total Stok</span><span class="text-surface-500">:</span><span id="infoTotalStok" class="font-medium text-surface-800">-</span>
+              <span class="font-semibold text-surface-700">Qty Pakai Barang</span><span class="text-surface-500">:</span><span id="infoQtyPakai" class="font-medium text-surface-800">-</span>
+            </div>
+          </div>
+
+          <!-- Expired Date -->
+          <div>
+            <label class="label label-required">Expired Date</label>
+            <input id="expDate" type="text" class="input-field input-readonly" readonly placeholder="dd.MM.yy" />
+          </div>
+
+          <!-- SATUAN Section -->
+          <div>
+            <h3 class="section-title mb-3 flex items-center gap-2">
+              <span class="w-1.5 h-5 bg-primary-600 rounded-full inline-block"></span>
+              SATUAN
+            </h3>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label class="label label-required">Jumlah Tes dalam Satuan</label>
+                <input id="jumlahTesSatuan" type="number" class="input-field" min="0" placeholder="0" />
+              </div>
+              <div>
+                <label class="label">Nomor Serial</label>
+                <input id="nomorSerial" type="text" class="input-field" placeholder="Masukkan serial" />
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="label label-required">Sisa Tes</label>
+              <input id="sisaTes" type="number" class="input-field" min="0" placeholder="0" />
+            </div>
+            <label class="flex items-center gap-2.5 cursor-pointer group">
+              <input id="tandaiTidakTerpakai" type="checkbox" class="w-4 h-4 rounded border-surface-300 text-primary-600 focus:ring-primary-500" />
+              <span class="text-sm text-surface-600 group-hover:text-surface-800 transition-colors">Tandai sisa tes tidak terpakai</span>
+            </label>
+          </div>
+
+          <!-- TES HARIAN Section -->
+          <div>
+            <h3 class="section-title mb-1 flex items-center gap-2">
+              <span class="w-1.5 h-5 bg-primary-600 rounded-full inline-block"></span>
+              TES HARIAN
+            </h3>
+            <p class="text-sm text-surface-500 mb-3 italic">Isi sesuai dengan reagent yang digunakan</p>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label class="label">Kalibrasi</label>
+                <input id="tesKalibrasi" type="number" class="input-field" min="0" value="0" oninput="updateJumlahHarian()" />
+              </div>
+              <div>
+                <label class="label">Kontrol</label>
+                <input id="tesKontrol" type="number" class="input-field" min="0" value="0" oninput="updateJumlahHarian()" />
+              </div>
+              <div>
+                <label class="label">Jumlah Pasien</label>
+                <input id="tesPasien" type="number" class="input-field" min="0" value="0" oninput="updateJumlahHarian()" />
+              </div>
+              <div>
+                <label class="label">Duplo</label>
+                <input id="tesDuplo" type="number" class="input-field" min="0" value="0" oninput="updateJumlahHarian()" />
+              </div>
+            </div>
+            <div>
+              <label class="label">Jumlah Tes Harian</label>
+              <input id="jumlahTesHarian" type="text" class="input-field input-readonly" readonly value="0" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="px-7 py-4 bg-surface-50 border-t border-surface-100 flex items-center justify-end gap-3 shrink-0">
+          <button onclick="closeJumlahPeriksaModal()" class="btn-outline text-sm py-2.5 px-5">Batal</button>
+          <button onclick="submitJumlahPeriksa()" class="btn-primary text-sm py-2.5 px-5">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TOAST ==================== -->
+  <div id="toast" class="fixed bottom-6 right-6 z-[100] hidden">
+    <div class="bg-surface-800 text-white px-5 py-3 rounded-xl shadow-lg flex items-center gap-3 slide-in">
+      <i id="toastIcon" class="fas fa-check-circle text-primary-400"></i>
+      <span id="toastMessage" class="text-sm font-medium"></span>
+    </div>
+  </div>
+
+  <script>
+    // ==================== DATA ====================
+    let currentDate = new Date();
+    let itemsData = {};
+    let editingItemId = null;
+
+    const mockReagents = [
+      { code: 'RG2266', name: 'ARC Hbsag Next Qual Control', lot: '69231FZ00', exp: '15.04.26', unit: 'Bal', stock: 4, qtyPerUnit: 400 },
+      { code: 'RG0001', name: 'Contoh Barang Reagent', lot: 'LOT123', exp: '12.12.26', unit: 'Pcs', stock: 40, qtyPerUnit: 50 },
+      { code: 'RG1088', name: 'Hemoglobin Test Strip', lot: 'HB2024A', exp: '08.12.26', unit: 'Box', stock: 12, qtyPerUnit: 200 },
+      { code: 'RG3045', name: 'Urine Reagent Strip 10', lot: 'UR10B3', exp: '20.06.27', unit: 'Botol', stock: 8, qtyPerUnit: 100 },
+    ];
+
+    // Seed some initial data
+    function seedData() {
+      const today = formatDateKey(new Date());
+      const yesterday = formatDateKey(new Date(Date.now() - 86400000));
+      const twoDaysAgo = formatDateKey(new Date(Date.now() - 2 * 86400000));
+
+      itemsData[twoDaysAgo] = [
+        { id: 'item_1', code: 'RG0002', name: 'Contoh Barang Reagent', lot: 'LOT123', exp: '12.12.26', unit: 'Pcs', stock: 40, sisaTest: 4, control: 12, kalibrasi: 24, pasien: 12, trombosit: 24, history: [{ time: '13:13:13', user: 'User', control: 12, kalibrasi: 24, pasien: 12, trombosit: 24, total: 72 }] },
+      ];
+      itemsData[yesterday] = [
+        { id: 'item_2', code: 'RG0002', name: 'Contoh Barang Reagent', lot: 'LOT123', exp: '12.12.26', unit: 'Pcs', stock: 40, sisaTest: 40, control: 0, kalibrasi: 0, pasien: 0, trombosit: 0, history: [] },
+      ];
+      itemsData[today] = [
+        { id: 'item_3', code: 'RG0001', name: 'Contoh Barang Reagent', lot: 'LOT123', exp: '12.12.26', unit: 'Pcs', stock: 40, sisaTest: 40, control: 0, kalibrasi: 0, pasien: 0, trombosit: 0, history: [] },
+        { id: 'item_4', code: 'RG0002', name: 'Contoh Barang Reagent', lot: 'LOT123', exp: '12.12.26', unit: 'Pcs', stock: 40, sisaTest: 40, control: 0, kalibrasi: 0, pasien: 0, trombosit: 0, history: [{ time: '13:13:13', user: 'User', control: 12, kalibrasi: 24, pasien: 12, trombosit: 24, total: 72 }] },
+      ];
+    }
+
+    // ==================== DATE UTILS ====================
+    const monthNames = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+    function formatDateKey(d) {
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function formatDateDisplay(d) {
+      return `${d.getDate()} ${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+    }
+
+    function formatDateShort(d) {
+      return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getFullYear()).slice(-2)}`;
+    }
+
+    function changeDate(delta) {
+      currentDate.setDate(currentDate.getDate() + delta);
+      updateDateDisplay();
+      renderItems();
+    }
+
+    function updateDateDisplay() {
+      document.getElementById('currentDateDisplay').textContent = formatDateDisplay(currentDate);
+    }
+
+    // ==================== RENDER ====================
+    function renderItems() {
+      const key = formatDateKey(currentDate);
+      const items = itemsData[key] || [];
+      const container = document.getElementById('itemsList');
+      const emptyState = document.getElementById('emptyState');
+
+      if (items.length === 0) {
+        container.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+
+      container.innerHTML = items.map(item => {
+        const isDisabled = item.sisaTest <= 0;
+        const isPast = formatDateKey(currentDate) < formatDateKey(new Date());
+        const inputClass = isDisabled || isPast ? 'input-disabled' : '';
+        const inputAttrs = isDisabled || isPast ? 'disabled' : '';
+
+        return `
+          <div class="px-5 py-3 item-row" id="row-${item.id}">
+            <div class="grid grid-cols-12 gap-2 items-center">
+              <div class="col-span-1">
+                ${isDisabled
+                  ? '<i class="fas fa-eye-slash text-surface-400" title="Sisa tes habis"></i>'
+                  : '<i class="fas fa-qrcode text-primary-500" title="Aktif"></i>'
+                }
+              </div>
+              <div class="col-span-2">
+                <span class="font-bold text-sm text-surface-800">${item.code}</span>
+              </div>
+              <div class="col-span-3">
+                <div class="text-sm font-medium text-surface-700 leading-tight">${item.name}</div>
+                <div class="text-xs text-surface-400 mt-0.5">- ${item.lot} &middot; ${item.exp}</div>
+              </div>
+              <div class="col-span-1">
+                <input type="number" min="0" value="${item.control}" ${inputAttrs} class="table-input ${inputClass}" onchange="updateItemField('${item.id}','control',this.value)" />
+              </div>
+              <div class="col-span-1">
+                <input type="number" min="0" value="${item.kalibrasi}" ${inputAttrs} class="table-input ${inputClass}" onchange="updateItemField('${item.id}','kalibrasi',this.value)" />
+              </div>
+              <div class="col-span-1">
+                <input type="number" min="0" value="${item.pasien}" ${inputAttrs} class="table-input ${inputClass}" onchange="updateItemField('${item.id}','pasien',this.value)" />
+              </div>
+              <div class="col-span-1">
+                <input type="number" min="0" value="${item.trombosit}" ${inputAttrs} class="table-input ${inputClass}" onchange="updateItemField('${item.id}','trombosit',this.value)" />
+              </div>
+              <div class="col-span-1 text-center">
+                <span class="text-sm font-semibold ${item.sisaTest <= 0 ? 'text-red-500' : 'text-surface-700'}">${item.sisaTest} ${item.unit}</span>
+              </div>
+              <div class="col-span-1 text-right">
+                <button onclick="submitItemTests('${item.id}')" class="text-surface-400 hover:text-primary-600 transition-colors p-1.5 rounded-lg hover:bg-primary-50" title="Simpan & Catat">
+                  <i class="fas fa-level-down-alt"></i>
+                </button>
+              </div>
+            </div>
+
+            ${item.history.length > 0 ? `
+              <div class="mt-3 ml-6 bg-surface-50 rounded-lg border border-surface-100 overflow-hidden">
+                <table class="w-full text-xs">
+                  <thead>
+                    <tr class="bg-surface-100 text-surface-600 uppercase tracking-wider">
+                      <th class="text-left py-2 px-3 font-semibold">Waktu</th>
+                      <th class="text-left py-2 px-3 font-semibold">Dicatat Oleh</th>
+                      <th class="text-center py-2 px-3 font-semibold">Control</th>
+                      <th class="text-center py-2 px-3 font-semibold">Kalibrasi</th>
+                      <th class="text-center py-2 px-3 font-semibold">Pasien</th>
+                      <th class="text-center py-2 px-3 font-semibold">Agregasi Trombosit</th>
+                      <th class="text-center py-2 px-3 font-semibold">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${item.history.map(h => `
+                      <tr class="border-t border-surface-100">
+                        <td class="py-2 px-3 font-medium text-surface-700">${h.time}</td>
+                        <td class="py-2 px-3 text-surface-600">${h.user}</td>
+                        <td class="py-2 px-3 text-center text-surface-700">${h.control}</td>
+                        <td class="py-2 px-3 text-center text-surface-700">${h.kalibrasi}</td>
+                        <td class="py-2 px-3 text-center text-surface-700">${h.pasien}</td>
+                        <td class="py-2 px-3 text-center text-surface-700">${h.trombosit}</td>
+                        <td class="py-2 px-3 text-center font-bold text-surface-800">${h.total}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ==================== ITEM FIELD UPDATES ====================
+    function updateItemField(itemId, field, value) {
+      const key = formatDateKey(currentDate);
+      const items = itemsData[key];
+      if (!items) return;
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+
+      const newVal = parseInt(value) || 0;
+      item[field] = newVal;
+
+      // Recalculate sisaTest
+      const totalUsed = item.control + item.kalibrasi + item.pasien + item.trombosit;
+      item.sisaTest = Math.max(0, item.qtyPerUnit - totalUsed);
+
+      renderItems();
+    }
+
+    function submitItemTests(itemId) {
+      const key = formatDateKey(currentDate);
+      const items = itemsData[key];
+      if (!items) return;
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+
+      const total = item.control + item.kalibrasi + item.pasien + item.trombosit;
+      if (total === 0) {
+        showToast('Mohon isi minimal satu field tes', 'warning');
+        return;
+      }
+
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+
+      item.history.push({
+        time: timeStr,
+        user: 'User',
+        control: item.control,
+        kalibrasi: item.kalibrasi,
+        pasien: item.pasien,
+        trombosit: item.trombosit,
+        total: total
+      });
+
+      // Reset inline fields
+      item.control = 0;
+      item.kalibrasi = 0;
+      item.pasien = 0;
+      item.trombosit = 0;
+
+      renderItems();
+      showToast('Data tes berhasil dicatat!');
+    }
+
+    // ==================== PAKAI BARANG MODAL ====================
+    function openPakaiBarangModal() {
+      const modal = document.getElementById('pakaiBarangModal');
+      modal.classList.remove('hidden');
+      document.getElementById('pakaiTanggal').value = formatDateDisplay(currentDate) + ' ' + new Date().toTimeString().slice(0,8);
+      document.getElementById('pakaiItem').value = '';
+      document.getElementById('pakaiLot').value = '';
+      document.getElementById('pakaiLotBadge').classList.add('hidden');
+      document.getElementById('pakaiSatuan').value = '';
+      document.getElementById('pakaiSatuan').disabled = true;
+      document.getElementById('pakaiStock').value = '';
+      document.getElementById('pakaiQty').value = 1;
+      document.querySelector('input[name="lanjutkan"][value="ya"]').checked = true;
+    }
+
+    function closePakaiBarangModal() {
+      const modal = document.getElementById('pakaiBarangModal');
+      const content = modal.querySelector('.slide-in');
+      content.classList.remove('slide-in');
+      content.classList.add('slide-out');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        content.classList.remove('slide-out');
+        content.classList.add('slide-in');
+      }, 250);
+    }
+
+    function onItemSelect() {
+      const select = document.getElementById('pakaiItem');
+      const opt = select.options[select.selectedIndex];
+      if (!opt.value) {
+        document.getElementById('pakaiLot').value = '';
+        document.getElementById('pakaiLotBadge').classList.add('hidden');
+        document.getElementById('pakaiSatuan').value = '';
+        document.getElementById('pakaiSatuan').disabled = true;
+        document.getElementById('pakaiStock').value = '';
+        return;
+      }
+      document.getElementById('pakaiLot').value = opt.dataset.lot;
+      document.getElementById('pakaiLotBadge').classList.remove('hidden');
+      document.getElementById('pakaiSatuan').value = opt.dataset.unit;
+      document.getElementById('pakaiSatuan').disabled = false;
+      document.getElementById('pakaiStock').value = opt.dataset.stock;
+    }
+
+    function handlePakaiBarangNext() {
+      const item = document.getElementById('pakaiItem');
+      if (!item.value) {
+        showToast('Pilih item terlebih dahulu', 'warning');
+        return;
+      }
+      const qty = parseInt(document.getElementById('pakaiQty').value) || 0;
+      if (qty < 1) {
+        showToast('Qty minimal 1', 'warning');
+        return;
+      }
+
+      const lanjutkan = document.querySelector('input[name="lanjutkan"]:checked').value;
+
+      if (lanjutkan === 'ya') {
+        closePakaiBarangModal();
+        setTimeout(() => openJumlahPeriksaModal(), 300);
+      } else {
+        // Just add to list without test count form
+        addItemToList();
+        closePakaiBarangModal();
+      }
+    }
+
+    function addItemToList() {
+      const key = formatDateKey(currentDate);
+      if (!itemsData[key]) itemsData[key] = [];
+
+      const opt = document.getElementById('pakaiItem').options[document.getElementById('pakaiItem').selectedIndex];
+      const qty = parseInt(document.getElementById('pakaiQty').value) || 1;
+      const qtyPerUnit = parseInt(opt.dataset.qtyTest) || 100;
+
+      const newItem = {
+        id: 'item_' + Date.now(),
+        code: opt.value,
+        name: opt.dataset.name,
+        lot: opt.dataset.lot,
+        exp: opt.dataset.exp,
+        unit: document.getElementById('pakaiSatuan').value || opt.dataset.unit,
+        stock: parseInt(opt.dataset.stock),
+        sisaTest: qtyPerUnit * qty,
+        qtyPerUnit: qtyPerUnit,
+        qtyUsed: qty,
+        control: 0,
+        kalibrasi: 0,
+        pasien: 0,
+        trombosit: 0,
+        expiredDate: opt.dataset.exp,
+        nomorSerial: '',
+        history: []
+      };
+
+      itemsData[key].push(newItem);
+      renderItems();
+      showToast('Reagent berhasil ditambahkan!');
+    }
+
+    function markAsHoliday() {
+      closePakaiBarangModal();
+      showToast('Hari ini ditandai sebagai hari libur');
+    }
+
+    // ==================== JUMLAH PERIKSA MODAL ====================
+    function openJumlahPeriksaModal() {
+      const modal = document.getElementById('jumlahPeriksaModal');
+      const opt = document.getElementById('pakaiItem').options[document.getElementById('pakaiItem').selectedIndex];
+      const qty = parseInt(document.getElementById('pakaiQty').value) || 1;
+
+      document.getElementById('infoKodeBarang').textContent = opt.value;
+      document.getElementById('infoNamaBarang').textContent = opt.dataset.name;
+      document.getElementById('infoNomorLot').textContent = opt.dataset.lot;
+      document.getElementById('infoTotalStok').textContent = opt.dataset.stock;
+      document.getElementById('infoQtyPakai').textContent = qty;
+      document.getElementById('expDate').value = opt.dataset.exp;
+      document.getElementById('jumlahTesSatuan').value = opt.dataset.qtyTest || '';
+      document.getElementById('nomorSerial').value = '';
+      document.getElementById('sisaTes').value = opt.dataset.qtyTest || '';
+      document.getElementById('tandaiTidakTerpakai').checked = false;
+      document.getElementById('tesKalibrasi').value = 0;
+      document.getElementById('tesKontrol').value = 0;
+      document.getElementById('tesPasien').value = 0;
+      document.getElementById('tesDuplo').value = 0;
+      document.getElementById('jumlahTesHarian').value = 0;
+
+      // Store reference for submission
+      editingItemId = {
+        code: opt.value,
+        name: opt.dataset.name,
+        lot: opt.dataset.lot,
+        exp: opt.dataset.exp,
+        unit: document.getElementById('pakaiSatuan').value || opt.dataset.unit,
+        stock: parseInt(opt.dataset.stock),
+        qtyUsed: qty,
+        qtyPerUnit: parseInt(opt.dataset.qtyTest) || 100,
+      };
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeJumlahPeriksaModal() {
+      const modal = document.getElementById('jumlahPeriksaModal');
+      const content = modal.querySelector('.slide-in');
+      content.classList.remove('slide-in');
+      content.classList.add('slide-out');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        content.classList.remove('slide-out');
+        content.classList.add('slide-in');
+      }, 250);
+    }
+
+    function updateJumlahHarian() {
+      const k = parseInt(document.getElementById('tesKalibrasi').value) || 0;
+      const ko = parseInt(document.getElementById('tesKontrol').value) || 0;
+      const p = parseInt(document.getElementById('tesPasien').value) || 0;
+      const d = parseInt(document.getElementById('tesDuplo').value) || 0;
+      document.getElementById('jumlahTesHarian').value = k + ko + p + d;
+    }
+
+    function submitJumlahPeriksa() {
+      if (!editingItemId) return;
+
+      const sisaTes = parseInt(document.getElementById('sisaTes').value) || 0;
+      const jumlahSatuan = parseInt(document.getElementById('jumlahTesSatuan').value) || 0;
+
+      const key = formatDateKey(currentDate);
+      if (!itemsData[key]) itemsData[key] = [];
+
+      const newItem = {
+        id: 'item_' + Date.now(),
+        code: editingItemId.code,
+        name: editingItemId.name,
+        lot: editingItemId.lot,
+        exp: editingItemId.exp,
+        unit: editingItemId.unit,
+        stock: editingItemId.stock,
+        sisaTest: sisaTes,
+        qtyPerUnit: jumlahSatuan,
+        qtyUsed: editingItemId.qtyUsed,
+        control: 0,
+        kalibrasi: 0,
+        pasien: 0,
+        trombosit: 0,
+        expiredDate: document.getElementById('expDate').value,
+        nomorSerial: document.getElementById('nomorSerial').value,
+        sisaTesAwal: sisaTes,
+        tandaiTidakTerpakai: document.getElementById('tandaiTidakTerpakai').checked,
+        tesHarian: {
+          kalibrasi: parseInt(document.getElementById('tesKalibrasi').value) || 0,
+          kontol: parseInt(document.getElementById('tesKontrol').value) || 0,
+          pasien: parseInt(document.getElementById('tesPasien').value) || 0,
+          duplo: parseInt(document.getElementById('tesDuplo').value) || 0,
+          total: parseInt(document.getElementById('jumlahTesHarian').value) || 0,
+        },
+        history: []
+      };
+
+      itemsData[key].push(newItem);
+      editingItemId = null;
+
+      closeJumlahPeriksaModal();
+      renderItems();
+      showToast('Jumlah periksa berhasil disimpan!');
+    }
+
+    // ==================== TOAST ====================
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const icon = document.getElementById('toastIcon');
+      const msg = document.getElementById('toastMessage');
+
+      msg.textContent = message;
+      icon.className = type === 'success'
+        ? 'fas fa-check-circle text-primary-400'
+        : 'fas fa-exclamation-triangle text-yellow-400';
+
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 3000);
+    }
+
+    // ==================== INIT ====================
+    seedData();
+    updateDateDisplay();
+    renderItems();
+  </script>
+</body>
+</html>
