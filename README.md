@@ -21,7 +21,7 @@ Over the years, I’ve worked on both freelance and personal projects—like dev
 Total Time: 4,649 hrs 20 mins
 
 TypeScript                 2,207 hrs 51 mins     ██████████▓░░░░░░░░░░░░░░   42.10 %
-Other                      594 hrs 24 mins       ███░░░░░░░░░░░░░░░░░░░░░░   11.34 %
+Other                      594 hrs 42 mins       ███░░░░░░░░░░░░░░░░░░░░░░   11.34 %
 ```
 
 <!--END_SECTION:waka-->
